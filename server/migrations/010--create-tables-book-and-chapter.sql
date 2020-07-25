@@ -1,0 +1,11 @@
+CREATE TABLE book (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE chapter (
+  id SERIAL PRIMARY KEY,
+  book_id INTEGER REFERENCES book (id) NOT NULL,
+  title VARCHAR(100) NOT NULL,
+  read_at TIMESTAMPTZ
+);
