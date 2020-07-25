@@ -1,0 +1,36 @@
+# user pov
+- create a book
+  - title
+  - list chapters
+
+- delete a book
+
+- mark a chapter done
+
+- unmark a chapter done
+
+# tables
+book
+- id
+- title
+
+chapter (ordering is defined by id)
+- id
+- book_id
+- title
+- read_at
+
+# api
+
+get all books (just titles)
+get book (and chapters)
+create book (and chapters)
+delete book
+mark chapter done
+unmark chapter done
+
+
+# v2+
+- edit book titles, chapter titles, chapter order, add/remove chapters
+- chapter length
+- chapter hierarchy
