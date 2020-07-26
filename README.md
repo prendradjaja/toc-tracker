@@ -43,12 +43,8 @@ npm run build-watch
 
 From root directory:
 ```
-heroku local:run npm run _serve --prefix server
+npm run server-dev
 ```
-
-(Can't just do `npm run _serve` from the server directory because `heroku
-local` is needed to provide environment variables, so I marked it "private"
-with `_`. TODO: Maybe use `dotenv` package?)
 
 Then visit: http://localhost:8000/
 
