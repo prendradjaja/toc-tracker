@@ -25,3 +25,8 @@
   background-color: #81de6a;
   border-color: #326127;
 }
+
+#state-add textarea {
+  width: 400px;
+  height: 400px;
+}

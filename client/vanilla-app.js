@@ -48,6 +48,11 @@ function showBook(id) {
     });
 }
 
+function showAdd() {
+  hideAllStates();
+  document.querySelector('#state-add').classList.remove('hide');
+}
+
 function toggleRead(chapterId) {
   const chapterElement = document.querySelector('#' + makeChapterElementId(chapterId));
   const button = chapterElement.querySelector('button.read-toggle')
@@ -76,4 +81,18 @@ function toggleRead(chapterId) {
 
 function makeChapterElementId(chapterId) {
   return 'chapter-' + chapterId;
+}
+
+function submitNewBook() {
+  const title = (
+    document.querySelector('#state-add input').value || ''
+  ).trim();
+  const chapters = (
+    document.querySelector('#state-add textarea').value || ''
+  ).trim().split('\n');
+  const button = document.querySelector('#state-add button').disabled = true;
+  createBook({ title, chapters })
+    .then(() => { window.alert("Success!"); })
+    .catch(() => { window.alert("Failed."); })
+    .finally(() => { showHome(); });
 }

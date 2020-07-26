@@ -19,6 +19,20 @@ function setChapterUnread(id) {
 }
 
 /**
+ * body = { title: string, chapters: string[] }
+ */
+function createBook(body) {
+  return myFetch('/api/books', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+    .then(() => undefined);
+}
+
+/**
  * Rejects upon non-2XX (fetch doesn't do this!).
  */
 function myFetch(input, init) {

@@ -1,13 +1,24 @@
 <link rel="stylesheet" href="./vanilla-styles.css">
 
 <div id="state-home" class="state hide">
+  <a href="#" onclick="showAdd()">Add a book</a>
   <ul class="books"></ul>
 </div>
 
 <div id="state-book" class="state hide">
   <a href="#" onclick="showHome()">Home</a>
-
   <ul class="chapters"></ul>
+</div>
+
+<div id="state-add" class="state hide">
+  <a href="#" onclick="showHome()">Home</a>
+  <div>
+    Title: <input>
+  </div>
+  <textarea></textarea>
+  <div>
+    <button onclick="submitNewBook()">Add book</button>
+  </div>
 </div>
 
 <script src="./api.js"></script>
