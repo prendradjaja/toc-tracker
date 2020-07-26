@@ -11,9 +11,12 @@
 
 #### Server
 
+From the root directory:
 ```
-cd toc-tracker/server
+cp .env_example .env
 
+From the `server` directory:
+```
 # Set up database
 psql -c "CREATE DATABASE toc_tracker"
 ./scripts/run-all-migrations.sh
@@ -39,8 +42,12 @@ npm run build-watch
 
 ```
 cd toc-tracker/server
-npm run serve
+heroku local:run npm run _serve --prefix server
 ```
+
+`_serve` is defined in server/package.json, but won't work by running directly
+because `heroku local` is needed to provide environment variables (TODO: Maybe
+use `dotenv` package?), so I marked it "private" with `_`.
 
 Then visit: http://localhost:8000/
 
