@@ -8,6 +8,16 @@ function getBook(id) {
     .then(response => response.json());
 }
 
+function setChapterRead(id) {
+  return myFetch(`/api/chapters/${id}/read`, { method: 'POST' })
+    .then(() => undefined);
+}
+
+function setChapterUnread(id) {
+  return myFetch(`/api/chapters/${id}/unread`, { method: 'POST' })
+    .then(() => undefined);
+}
+
 /**
  * Rejects upon non-2XX (fetch doesn't do this!).
  */

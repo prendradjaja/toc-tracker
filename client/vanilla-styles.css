@@ -1,3 +1,27 @@
 .hide {
   display: none;
 }
+
+.read-toggle {
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border: 1px solid gray;
+}
+
+.read-toggle[disabled] {
+  background-color: gray;
+}
+
+.read-toggle:not([disabled]):hover {
+  opacity: 0.5;
+}
+
+.read-toggle:focus {
+  outline: none;
+}
+
+.read-toggle:not([disabled]).read {
+  background-color: #81de6a;
+  border-color: #326127;
+}
