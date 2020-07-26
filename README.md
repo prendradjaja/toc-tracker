@@ -14,6 +14,7 @@
 From the root directory:
 ```
 cp .env_example .env
+```
 
 From the `server` directory:
 ```
