@@ -36,19 +36,19 @@ Nothing to build! Plain JS & HTML (for now?)
 
 In two separate terminals:
 
+From server directory:
 ```
-cd toc-tracker/server
 npm run build-watch
 ```
 
+From root directory:
 ```
-cd toc-tracker/server
 heroku local:run npm run _serve --prefix server
 ```
 
-`_serve` is defined in server/package.json, but won't work by running directly
-because `heroku local` is needed to provide environment variables (TODO: Maybe
-use `dotenv` package?), so I marked it "private" with `_`.
+(Can't just do `npm run _serve` from the server directory because `heroku
+local` is needed to provide environment variables, so I marked it "private"
+with `_`. TODO: Maybe use `dotenv` package?)
 
 Then visit: http://localhost:8000/
 
