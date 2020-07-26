@@ -78,20 +78,21 @@ function configureRoutes() {
   });
 
   app.delete('/api/books/:id', async (req, res) => {
+    const { id } = req.params;
+    await fakeNetworkDelay();
+    const pgClient = await pgPool.connect();
     try {
-      await fakeNetworkDelay();
-      const { id } = req.params;
-      const queryResult = await pgPool.query(
-        'DELETE FROM book WHERE id = $1',
-        [id]
-      );
-      if (!queryResult.rowCount) {
-        throw new Error("Book not found: ID " + id)
-      }
+      await pgClient.query('BEGIN');
+      await pgClient.query('DELETE FROM chapter WHERE book_id = $1', [id]);
+      await pgClient.query('DELETE FROM book WHERE id = $1', [id]);
+      await pgClient.query('COMMIT')
       res.send('{}')
     } catch (err) {
+      await pgClient.query('ROLLBACK')
       console.error(err);
       res.status(500).send("Error " + err);
+    } finally {
+      pgClient.release();
     }
   })
 
