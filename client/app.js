@@ -39,7 +39,7 @@ const bookPage = {
             :disabled="loading[chapter.id]"
             @toggle="toggle(chapter)"
           ></my-checkbox>
-          {{ chapter.title }} loading: {{ loading[chapter.id] }}
+          {{ chapter.title }}
         </li>
       </ul>
       <ul v-else>
