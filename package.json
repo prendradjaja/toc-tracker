@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "heroku-postbuild": "cd server && npm install && npm run build",
-    "start": "cd server && npm run start"
+    "start": "cd server && npm run start",
+    "server-dev": "heroku local:run npm run _serve --prefix server"
   },
   "repository": {
     "type": "git",

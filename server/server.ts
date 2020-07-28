@@ -1,7 +1,14 @@
 import * as express from "express";
 import { Pool } from "pg";
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/toc_tracker';
+// Required variables
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error("FATAL: At least one required environment variable is missing");
+  process.exit(1);
+}
+
+// Optional variables
 const PORT = process.env.PORT || 8000;
 
 const app = express();

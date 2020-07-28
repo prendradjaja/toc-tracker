@@ -11,9 +11,13 @@
 
 #### Server
 
+From the root directory:
 ```
-cd toc-tracker/server
+cp .env_example .env
+```
 
+From the `server` directory:
+```
 # Set up database
 psql -c "CREATE DATABASE toc_tracker"
 ./scripts/run-all-migrations.sh
@@ -32,14 +36,14 @@ Nothing to build! Plain JS & HTML (for now?)
 
 In two separate terminals:
 
+From server directory:
 ```
-cd toc-tracker/server
 npm run build-watch
 ```
 
+From root directory:
 ```
-cd toc-tracker/server
-npm run serve
+npm run server-dev
 ```
 
 Then visit: http://localhost:8000/
