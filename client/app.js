@@ -36,9 +36,10 @@ const bookPage = {
         <li v-for="chapter in chapters" :key="chapter.id">
           <my-checkbox
             :read="!!chapter.read_at"
+            :disabled="loading[chapter.id]"
             @toggle="toggle(chapter)"
           ></my-checkbox>
-          {{ chapter.title }}
+          {{ chapter.title }} loading: {{ loading[chapter.id] }}
         </li>
       </ul>
       <ul v-else>
@@ -48,7 +49,8 @@ const bookPage = {
   `,
   data: function () {
     return {
-      chapters: undefined
+      chapters: undefined,
+      loading: undefined,
     };
   },
   created: function () {
@@ -60,12 +62,19 @@ const bookPage = {
       getBook(bookId)
         .then(book => {
           this.chapters = book.chapters;
+          this.loading = Object.fromEntries(
+            this.chapters.map(
+              chapter => [chapter.id, false]
+            )
+          );
         });
     },
     toggle: async function (chapter) {
       const setChapterState = chapter.read_at ? setChapterUnread : setChapterRead;
+      this.loading[chapter.id] = true;
       await setChapterState(chapter.id);
       await this.load();
+      this.loading[chapter.id] = false;
     },
   },
 };
@@ -78,11 +87,12 @@ const addBookPage = {
 };
 
 Vue.component('my-checkbox', {
-  props: ['read'],
+  props: ['read', 'disabled'],
   template: `
     <button
       class="read-toggle"
-      :class="{ read: read }"
+      :class="{ read }"
+      :disabled="disabled"
       @click="$emit('toggle')"
     ></button>
   `
