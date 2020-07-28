@@ -1,11 +1,6 @@
-import { getBooks } from './api.js';
+import { getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
 
 const homePage = {
-  data: function () {
-    return {
-      books: undefined
-    };
-  },
   template: `
     <div>
       <router-link to="/add">Add a book</router-link>
@@ -21,18 +16,51 @@ const homePage = {
       </ul>
     </div>
   `,
+  data: function () {
+    return {
+      books: undefined
+    };
+  },
   created: function () {
     getBooks()
       .then(books => {
         this.books = books;
       });
-  }
+  },
 };
-const bookPage = {template: `
-  <div>book {{ $route.params.id }}</div>
-`};
+const bookPage = {
+  template: `
+    <div>
+      <router-link to="/">Home</router-link>
+      <ul v-if="chapters">
+        <li v-for="chapter in chapters" :key="chapter.id">
+          {{ chapter.title }}
+        </li>
+      </ul>
+      <ul v-else>
+        <li>...</li>
+      </ul>
+    </div>
+  `,
+  data: function () {
+    return {
+      chapters: undefined
+    };
+  },
+  created: function () {
+    const bookId = this.$route.params.id;
+    getBook(bookId)
+      .then(book => {
+        this.chapters = book.chapters;
+      });
+  },
+};
 const addBookPage = {
-  template: `<div>add</div>`
+  template: `
+    <div>
+      <router-link to="/">Home</router-link>
+    </div>
+  `,
 };
 
 
