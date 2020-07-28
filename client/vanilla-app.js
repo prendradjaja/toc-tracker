@@ -1,3 +1,5 @@
+import { getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
+
 const globals = {
   chapters: [],
 };
@@ -96,3 +98,9 @@ function submitNewBook() {
     .catch(() => { window.alert("Failed."); })
     .finally(() => { showHome(); });
 }
+
+window.showBook = showBook;
+window.showHome = showHome;
+window.showAdd = showAdd;
+window.submitNewBook = submitNewBook;
+window.toggleRead = toggleRead;
