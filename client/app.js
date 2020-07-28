@@ -34,6 +34,10 @@ const bookPage = {
       <router-link to="/">Home</router-link>
       <ul v-if="chapters">
         <li v-for="chapter in chapters" :key="chapter.id">
+          <my-checkbox
+            :read="!!chapter.read_at"
+            @toggle="toggle(chapter)"
+          ></my-checkbox>
           {{ chapter.title }}
         </li>
       </ul>
@@ -48,11 +52,21 @@ const bookPage = {
     };
   },
   created: function () {
+    this.load();
+  },
+  methods: {
+    load: function () {
     const bookId = this.$route.params.id;
-    getBook(bookId)
-      .then(book => {
-        this.chapters = book.chapters;
-      });
+      getBook(bookId)
+        .then(book => {
+          this.chapters = book.chapters;
+        });
+    },
+    toggle: async function (chapter) {
+      const setChapterState = chapter.read_at ? setChapterUnread : setChapterRead;
+      await setChapterState(chapter.id);
+      await this.load();
+    },
   },
 };
 const addBookPage = {
@@ -62,6 +76,17 @@ const addBookPage = {
     </div>
   `,
 };
+
+Vue.component('my-checkbox', {
+  props: ['read'],
+  template: `
+    <button
+      class="read-toggle"
+      :class="{ read: read }"
+      @click="$emit('toggle')"
+    ></button>
+  `
+});
 
 
 const routes = [
