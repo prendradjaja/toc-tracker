@@ -118,7 +118,7 @@ function configureRoutes() {
   });
 
   app.get('/api/me',
-    myEnsureLoggedIn,
+    ensureLoggedIn,
     function(req, res){
       res.send({name: req.user.displayName});
     }
@@ -249,7 +249,10 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function myEnsureLoggedIn(req, res, next) {
+/**
+ * Based on connect-ensure-login
+ */
+function ensureLoggedIn(req, res, next) {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
     res.status(403).send("{}");
     return;
