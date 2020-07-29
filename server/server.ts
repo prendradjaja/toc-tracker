@@ -1,5 +1,7 @@
 import * as express from "express";
 import { Pool } from "pg";
+import * as passport from 'passport';
+import { Strategy } from 'passport-facebook';
 
 // Required variables
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -14,6 +16,86 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(express.json());
 app.use(express.static('../client'));
+app.use(require('morgan')('combined'));
+
+// From Passport example
+app.use(require('cookie-parser')());
+app.use(require('body-parser').urlencoded({ extended: true }));
+app.use(require('express-session')({
+  secret: 'keyboard cat', // TODO ?
+  resave: true,
+  saveUninitialized: true,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+passport.use(new Strategy({
+    clientID: process.env['FACEBOOK_CLIENT_ID'],
+    clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
+    callbackURL: '/return'
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    // ptodo implement
+
+    return cb(null, profile);
+    // User.findOrCreate(..., function(err, user) {
+    //   done(err, user);
+    // });
+
+  }));
+
+
+passport.serializeUser(function(user, cb) {
+  // ptodo implement
+
+  cb(null, user);
+  // done(null, user.id);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  // ptodo implement
+
+  cb(null, obj);
+  // User.findById(id, function(err, user) {
+  //   done(err, user);
+  // });
+});
+
+passport.use(new Strategy(
+  {
+  clientID: process.env['FACEBOOK_CLIENT_ID'],
+  clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
+  callbackURL: '/return'
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    // ptodo implement
+
+    return cb(null, profile);
+    // User.findOrCreate(..., function(err, user) {
+    //   done(err, user);
+    // });
+
+  }
+));
+
+
+passport.serializeUser(function(user, cb) {
+  // ptodo implement
+
+  cb(null, user);
+  // done(null, user.id);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  // ptodo implement
+
+  cb(null, obj);
+  // User.findById(id, function(err, user) {
+  //   done(err, user);
+  // });
+});
 
 const pgPool = new Pool({
   connectionString: DATABASE_URL,
@@ -25,6 +107,23 @@ configureRoutes();
 app.listen(PORT, () => console.log('Example app listening at http://localhost:'+PORT))
 
 function configureRoutes() {
+  app.get('/login/facebook',
+    passport.authenticate('facebook')
+  );
+
+  app.get('/return',
+    passport.authenticate('facebook', { failureRedirect: '/' }),
+    function(req, res) {
+      res.redirect('/');
+  });
+
+  app.get('/api/me',
+    myEnsureLoggedIn,
+    function(req, res){
+      res.send({name: req.user.displayName});
+    }
+  );
+
   app.get('/api/books', async (req, res) => {
     try {
       await fakeNetworkDelay();
@@ -148,4 +247,12 @@ function fakeNetworkDelay() {
 
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function myEnsureLoggedIn(req, res, next) {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    res.status(403).send("{}");
+    return;
+  }
+  next();
 }

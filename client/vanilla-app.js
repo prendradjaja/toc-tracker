@@ -96,3 +96,12 @@ function submitNewBook() {
     .catch(() => { window.alert("Failed."); })
     .finally(() => { showHome(); });
 }
+
+myFetch('/api/me')
+  .then(response => response.json())
+  .then(me => {
+    console.log('user received', me)
+  })
+  .catch(err => {
+    console.log('err fetching me', err)
+  })
