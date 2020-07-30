@@ -145,68 +145,92 @@ function configureRoutes() {
     }
   );
 
-  app.get('/api/books/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-      await fakeNetworkDelay();
-      const title = (await pgPool.query(`
-        SELECT title
-        FROM book
-        WHERE id = $1
-      `, [id])).rows[0].title;
-      const { rows: chapters } = await pgPool.query(`
-        SELECT *
-        FROM chapter
-        WHERE book_id = $1
-        ORDER BY id ASC
-      `, [id]);
-      res.send({ title, chapters });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error " + err);
-    }
-  });
-
-  app.post('/api/books', async (req, res) => {
-    const { title, chapters } = req.body;
-    await fakeNetworkDelay();
-    const pgClient = await pgPool.connect();
-    try {
-      await pgClient.query('BEGIN');
-      const bookId = (await pgClient.query('INSERT INTO book(title) VALUES ($1) RETURNING id', [title])).rows[0].id;
-      // TODO Do this loop as one query?
-      for (let chapter of chapters) {
-        await pgClient.query('INSERT INTO chapter(book_id, title) VALUES ($1, $2)', [bookId, chapter]);
+  app.get('/api/books/:id',
+    ensureLoggedIn,
+    async (req, res) => {
+      const { id } = req.params;
+      try {
+        await fakeNetworkDelay();
+        const { title, owner_id } = (await pgPool.query(`
+          SELECT title, owner_id
+          FROM book
+          WHERE id = $1
+        `, [id])).rows[0];
+        if (owner_id !== req.user.id) {
+          throw new Error(); // TODO In real life, should probably not even leak existence of others' data
+        }
+        const { rows: chapters } = await pgPool.query(`
+          SELECT *
+          FROM chapter
+          WHERE book_id = $1
+          ORDER BY id ASC
+        `, [id]);
+        res.send({ title, chapters });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Error " + err);
       }
-      await pgClient.query('COMMIT')
-      res.send('{}')
-    } catch (err) {
-      await pgClient.query('ROLLBACK')
-      console.error(err);
-      res.status(500).send("Error " + err);
-    } finally {
-      pgClient.release();
     }
-  });
+  );
 
-  app.delete('/api/books/:id', async (req, res) => {
-    const { id } = req.params;
-    await fakeNetworkDelay();
-    const pgClient = await pgPool.connect();
-    try {
-      await pgClient.query('BEGIN');
-      await pgClient.query('DELETE FROM chapter WHERE book_id = $1', [id]);
-      await pgClient.query('DELETE FROM book WHERE id = $1', [id]);
-      await pgClient.query('COMMIT')
-      res.send('{}')
-    } catch (err) {
-      await pgClient.query('ROLLBACK')
-      console.error(err);
-      res.status(500).send("Error " + err);
-    } finally {
-      pgClient.release();
+  app.post('/api/books',
+    ensureLoggedIn,
+    async (req, res) => {
+      const { title, chapters } = req.body;
+      await fakeNetworkDelay();
+      const pgClient = await pgPool.connect();
+      try {
+        await pgClient.query('BEGIN');
+        const bookId = (await pgClient.query(`
+          INSERT INTO book(title, owner_id)
+          VALUES ($1, $2)
+          RETURNING id
+        `, [title, req.user.id])).rows[0].id;
+        // TODO Do this loop as one query?
+        for (let chapter of chapters) {
+          await pgClient.query('INSERT INTO chapter(book_id, title) VALUES ($1, $2)', [bookId, chapter]);
+        }
+        await pgClient.query('COMMIT')
+        res.send('{}')
+      } catch (err) {
+        await pgClient.query('ROLLBACK')
+        console.error(err);
+        res.status(500).send("Error " + err);
+      } finally {
+        pgClient.release();
+      }
     }
-  })
+  );
+
+  app.delete('/api/books/:id',
+    ensureLoggedIn,
+    async (req, res) => {
+      const { id } = req.params;
+      await fakeNetworkDelay();
+      const pgClient = await pgPool.connect();
+      try {
+        await pgClient.query('BEGIN');
+        const { owner_id } = (await pgPool.query(`
+          SELECT owner_id
+          FROM book
+          WHERE id = $1
+        `, [id])).rows[0];
+        if (owner_id !== req.user.id) {
+          throw new Error(); // TODO In real life, should probably not even leak existence of others' data
+        }
+        await pgClient.query('DELETE FROM chapter WHERE book_id = $1', [id]);
+        await pgClient.query('DELETE FROM book WHERE id = $1', [id]);
+        await pgClient.query('COMMIT')
+        res.send('{}')
+      } catch (err) {
+        await pgClient.query('ROLLBACK')
+        console.error(err);
+        res.status(500).send("Error " + err);
+      } finally {
+        pgClient.release();
+      }
+    }
+  )
 
   app.post('/api/chapters/:id/read', async (req, res) => {
     try {
