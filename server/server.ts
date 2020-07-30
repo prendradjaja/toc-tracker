@@ -1,7 +1,7 @@
 import * as express from "express";
 import { Pool } from "pg";
 import * as passport from 'passport';
-import { Strategy } from 'passport-facebook';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
 
 // Required variables
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -31,7 +31,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-passport.use(new Strategy(
+passport.use(new FacebookStrategy(
   {
   clientID: process.env['FACEBOOK_CLIENT_ID'],
   clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
