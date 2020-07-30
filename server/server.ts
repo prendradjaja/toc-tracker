@@ -56,7 +56,7 @@ passport.use(new Strategy(
           VALUES
             ('facebook', $1)
           RETURNING *
-        `, [profile.id])).rows[0]; // Should I store other profile fields?
+        `, [profile.id])).rows[0];
       }
       await pgClient.query('COMMIT');
       done(null, user);
@@ -122,7 +122,8 @@ function configureRoutes() {
     ensureLoggedIn,
     function(req, res){
       res.send({});
-      // res.send(req.user); // Should I send the whole object?
+      // Maybe actually send the user down -- not needed right now, since I'm just using this to
+      // check logged-in status.
     }
   );
 
