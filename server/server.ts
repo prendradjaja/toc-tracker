@@ -72,7 +72,7 @@ passport.use(new Strategy(
 
 
 passport.serializeUser(function(user, done) {
-  done(null, user.id);
+  done(null, (user as any).id);
 });
 
 passport.deserializeUser(async function(id, done) {
@@ -136,7 +136,7 @@ function configureRoutes() {
           FROM book
           WHERE owner_id = $1
           ORDER BY id DESC
-        `, [req.user.id]);
+        `, [getUserId(req)]);
         res.send(books);
       } catch (err) {
         console.error(err);
@@ -156,7 +156,7 @@ function configureRoutes() {
           FROM book
           WHERE id = $1
         `, [id])).rows[0];
-        if (owner_id !== req.user.id) {
+        if (owner_id !== getUserId(req)) {
           throw new Error(); // TODO In real life, should probably not even leak existence of others' data
         }
         const { rows: chapters } = await pgPool.query(`
@@ -185,7 +185,7 @@ function configureRoutes() {
           INSERT INTO book(title, owner_id)
           VALUES ($1, $2)
           RETURNING id
-        `, [title, req.user.id])).rows[0].id;
+        `, [title, getUserId(req)])).rows[0].id;
         // TODO Do this loop as one query?
         for (let chapter of chapters) {
           await pgClient.query('INSERT INTO chapter(book_id, title) VALUES ($1, $2)', [bookId, chapter]);
@@ -215,7 +215,7 @@ function configureRoutes() {
           FROM book
           WHERE id = $1
         `, [id])).rows[0];
-        if (owner_id !== req.user.id) {
+        if (owner_id !== getUserId(req)) {
           throw new Error(); // TODO In real life, should probably not even leak existence of others' data
         }
         await pgClient.query('DELETE FROM chapter WHERE book_id = $1', [id]);
@@ -244,7 +244,7 @@ function configureRoutes() {
           FROM book as b
           WHERE c.id = $1
             AND b.owner_id = $2
-        `, [id, req.user.id]);
+        `, [id, getUserId(req)]);
         if (!queryResult.rowCount) {
           throw new Error("Chapter not found: ID " + id)
         }
@@ -268,7 +268,7 @@ function configureRoutes() {
           FROM book as b
           WHERE c.id = $1
             AND b.owner_id = $2
-        `, [id, req.user.id]);
+        `, [id, getUserId(req)]);
         if (!queryResult.rowCount) {
           throw new Error("Chapter not found: ID " + id)
         }
@@ -298,4 +298,8 @@ function ensureLoggedIn(req, res, next) {
     return;
   }
   next();
+}
+
+function getUserId(req: express.Request): number {
+  return (req.user as any).id;
 }
