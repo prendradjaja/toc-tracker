@@ -126,20 +126,24 @@ function configureRoutes() {
     }
   );
 
-  app.get('/api/books', async (req, res) => {
-    try {
-      await fakeNetworkDelay();
-      const { rows: books } = await pgPool.query(`
-        SELECT *
-        FROM book
-        ORDER BY id DESC
-      `);
-      res.send(books);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error " + err);
+  app.get('/api/books',
+    ensureLoggedIn,
+    async (req, res) => {
+      try {
+        await fakeNetworkDelay();
+        const { rows: books } = await pgPool.query(`
+          SELECT *
+          FROM book
+          WHERE owner_id = $1
+          ORDER BY id DESC
+        `, [req.user.id]);
+        res.send(books);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Error " + err);
+      }
     }
-  });
+  );
 
   app.get('/api/books/:id', async (req, res) => {
     const { id } = req.params;
