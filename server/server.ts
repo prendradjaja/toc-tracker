@@ -115,6 +115,10 @@ function configureRoutes() {
   });
 
   app.get('/api/me',
+    async function(req, res, next) {
+      await fakeNetworkDelay();
+      next();
+    },
     ensureLoggedIn,
     function(req, res){
       res.send({});
