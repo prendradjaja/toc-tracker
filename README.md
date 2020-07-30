@@ -16,6 +16,8 @@ From the root directory:
 cp .env_example .env
 ```
 
+For authentication, create an app in the [Facebook developer console][facebook-dev] and copy your app ID and app secret into `.env`.
+
 From the `server` directory:
 ```
 # Set up database
@@ -57,4 +59,7 @@ heroku create
 git push heroku master
 heroku addons:create heroku-postgresql:hobby-dev
 heroku pg:psql < server/migrations/010--create-tables-book-and-chapter.sql
+heroku pg:psql < server/migrations/020--create-table-user.sql
 ```
+
+[facebook-dev]: https://developers.facebook.com/apps/
