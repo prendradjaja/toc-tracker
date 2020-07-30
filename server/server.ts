@@ -31,38 +31,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-passport.use(new Strategy({
-    clientID: process.env['FACEBOOK_CLIENT_ID'],
-    clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
-    callbackURL: '/return'
-  },
-  async function(accessToken, refreshToken, profile, cb) {
-    // ptodo implement
-
-    return cb(null, profile);
-    // User.findOrCreate(..., function(err, user) {
-    //   done(err, user);
-    // });
-
-  }));
-
-
-passport.serializeUser(function(user, cb) {
-  // ptodo implement
-
-  cb(null, user);
-  // done(null, user.id);
-});
-
-passport.deserializeUser(function(obj, cb) {
-  // ptodo implement
-
-  cb(null, obj);
-  // User.findById(id, function(err, user) {
-  //   done(err, user);
-  // });
-});
-
 passport.use(new Strategy(
   {
   clientID: process.env['FACEBOOK_CLIENT_ID'],
