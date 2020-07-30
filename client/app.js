@@ -80,10 +80,46 @@ const bookPage = {
 };
 const addBookPage = {
   template: `
-    <div>
+    <div class="add-book-page">
       <router-link to="/">Home</router-link>
+      <div>
+        Title: <input v-model.trim="title">
+      </div>
+      <textarea v-model.trim="chapters"></textarea>
+      <div>
+        <button
+          @click="submit()"
+          :disabled="submitting"
+        >
+          Add book
+        </button>
+      </div>
     </div>
   `,
+  data: function () {
+    return {
+      title: '',
+      chapters: '',
+      submitting: false,
+    }
+  },
+  methods: {
+    submit: function () {
+      this.submitting = true;
+      createBook({
+        title: this.title,
+        chapters: this.chapters.split('\n')
+      })
+        .then(() => {
+          window.alert("Success!");
+          this.$router.push('/');
+        })
+        .catch(() => {
+          window.alert("Failed.");
+          this.submitting = false;
+        })
+    }
+  }
 };
 
 Vue.component('my-checkbox', {

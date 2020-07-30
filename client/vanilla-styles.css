@@ -26,7 +26,7 @@
   border-color: #326127;
 }
 
-#state-add textarea {
+.add-book-page textarea {
   width: 400px;
   height: 400px;
 }
