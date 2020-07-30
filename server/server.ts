@@ -232,43 +232,53 @@ function configureRoutes() {
     }
   )
 
-  app.post('/api/chapters/:id/read', async (req, res) => {
-    try {
-      await fakeNetworkDelay();
-      const { id } = req.params;
-      const queryResult = await pgPool.query(`
-        UPDATE chapter
-        SET read_at = current_timestamp
-        WHERE id = $1
-      `, [id]);
-      if (!queryResult.rowCount) {
-        throw new Error("Chapter not found: ID " + id)
+  app.post('/api/chapters/:id/read',
+    ensureLoggedIn,
+    async (req, res) => {
+      try {
+        await fakeNetworkDelay();
+        const { id } = req.params;
+        const queryResult = await pgPool.query(`
+          UPDATE chapter as c
+          SET read_at = current_timestamp
+          FROM book as b
+          WHERE c.id = $1
+            AND b.owner_id = $2
+        `, [id, req.user.id]);
+        if (!queryResult.rowCount) {
+          throw new Error("Chapter not found: ID " + id)
+        }
+        res.send('{}')
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Error " + err);
       }
-      res.send('{}')
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error " + err);
     }
-  })
+  )
 
-  app.post('/api/chapters/:id/unread', async (req, res) => {
-    try {
-      await fakeNetworkDelay();
-      const { id } = req.params;
-      const queryResult = await pgPool.query(`
-        UPDATE chapter
-        SET read_at = NULL
-        WHERE id = $1
-      `, [id]);
-      if (!queryResult.rowCount) {
-        throw new Error("Chapter not found: ID " + id)
+  app.post('/api/chapters/:id/unread',
+    ensureLoggedIn,
+    async (req, res) => {
+      try {
+        await fakeNetworkDelay();
+        const { id } = req.params;
+        const queryResult = await pgPool.query(`
+          UPDATE chapter as c
+          SET read_at = NULL
+          FROM book as b
+          WHERE c.id = $1
+            AND b.owner_id = $2
+        `, [id, req.user.id]);
+        if (!queryResult.rowCount) {
+          throw new Error("Chapter not found: ID " + id)
+        }
+        res.send('{}')
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Error " + err);
       }
-      res.send('{}')
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error " + err);
     }
-  })
+  )
 }
 
 function fakeNetworkDelay() {
