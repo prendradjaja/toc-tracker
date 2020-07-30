@@ -33,9 +33,9 @@ app.use(passport.session());
 
 passport.use(new FacebookStrategy(
   {
-  clientID: process.env['FACEBOOK_CLIENT_ID'],
-  clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
-  callbackURL: '/return'
+    clientID: process.env['FACEBOOK_CLIENT_ID'],
+    clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
+    callbackURL: '/return'
   },
   async function(accessToken, refreshToken, profile, done) {
     const pgClient = await pgPool.connect();
