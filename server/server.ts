@@ -36,7 +36,7 @@ passport.use(new Strategy({
     clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
     callbackURL: '/return'
   },
-  function(accessToken, refreshToken, profile, cb) {
+  async function(accessToken, refreshToken, profile, cb) {
     // ptodo implement
 
     return cb(null, profile);
@@ -69,32 +69,61 @@ passport.use(new Strategy(
   clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
   callbackURL: '/return'
   },
-  function(accessToken, refreshToken, profile, cb) {
-    // ptodo implement
+  async function(accessToken, refreshToken, profile, done) {
+    const pgClient = await pgPool.connect();
+    try {
+      await pgClient.query('BEGIN');
 
-    return cb(null, profile);
-    // User.findOrCreate(..., function(err, user) {
-    //   done(err, user);
-    // });
+      let user = (await pgClient.query(`
+        SELECT *
+        FROM user_table
+        WHERE auth_provider = 'facebook'
+          AND id_from_provider = $1
+      `, [profile.id])).rows[0];
 
+      if (!user) {
+        user = (await pgClient.query(`
+          INSERT INTO
+            user_table(auth_provider, id_from_provider)
+          VALUES
+            ('facebook', $1)
+          RETURNING *
+        `, [profile.id])).rows[0];
+      }
+      await pgClient.query('COMMIT');
+      done(null, user);
+    } catch (err) {
+      await pgClient.query('ROLLBACK');
+      console.error(err);
+      done(true);
+    } finally {
+      pgClient.release();
+    }
   }
 ));
 
 
-passport.serializeUser(function(user, cb) {
-  // ptodo implement
-
-  cb(null, user);
-  // done(null, user.id);
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
 });
 
-passport.deserializeUser(function(obj, cb) {
-  // ptodo implement
-
-  cb(null, obj);
-  // User.findById(id, function(err, user) {
-  //   done(err, user);
-  // });
+passport.deserializeUser(async function(id, done) {
+  try {
+    const user = (await pgPool.query(`
+      SELECT *
+      FROM user_table
+      WHERE id = $1
+    `, [id])).rows[0];
+    if (user) {
+      done(null, user);
+    } else {
+      console.error('passport.deserializeUser could not find user with id:', id)
+      done(true);
+    }
+  } catch (err) {
+    console.error(err);
+    done(true);
+  }
 });
 
 const pgPool = new Pool({
@@ -120,7 +149,7 @@ function configureRoutes() {
   app.get('/api/me',
     ensureLoggedIn,
     function(req, res){
-      res.send({name: req.user.displayName});
+      res.send(req.user);
     }
   );
 
