@@ -1,3 +1,8 @@
+export function getMe() {
+  return myFetch('/api/me')
+    .then(response => response.json());
+}
+
 export function getBooks() {
   return myFetch('/api/books')
     .then(response => response.json());
@@ -44,4 +49,3 @@ function myFetch(input, init) {
       return response;
     })
 }
-

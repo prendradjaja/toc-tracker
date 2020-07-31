@@ -1,4 +1,4 @@
-import { getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
+import { getMe, getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
 
 const globals = {
   chapters: [],
@@ -8,7 +8,7 @@ main();
 
 function main() {
   showLoadingUser();
-  myFetch('/api/me')
+  getMe()
     .then(() => showHome())
     .catch(err => showLoggedOut());
 }

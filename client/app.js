@@ -1,8 +1,11 @@
-import { getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
+import { getMe, getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
 
 const homePage = {
   template: `
-    <div>
+    <div v-if="userLoading">
+      Loading...
+    </div>
+    <div v-else-if="user">
       <router-link to="/add">Add a book</router-link>
       <ul v-if="books">
         <li v-for="book in books" :key="book.id">
@@ -15,17 +18,28 @@ const homePage = {
         <li>...</li>
       </ul>
     </div>
+    <div v-else>
+      <a href="/login/facebook">Log in with Facebook</a>
+    </div>
   `,
   data: function () {
     return {
-      books: undefined
+      books: undefined,
+      userLoading: true,
+      user: undefined,
     };
   },
-  created: function () {
-    getBooks()
-      .then(books => {
-        this.books = books;
-      });
+  created: async function () {
+    let me;
+    try {
+      me = await getMe();
+      this.user = me;
+    } catch (error) {}
+    this.userLoading = false;
+
+    if (me) {
+      this.books = await getBooks();
+    }
   },
 };
 const bookPage = {
