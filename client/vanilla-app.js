@@ -1,3 +1,5 @@
+import { getMe, getBooks, getBook, setChapterRead, setChapterUnread, createBook } from './api.js';
+
 const globals = {
   chapters: [],
 };
@@ -6,7 +8,7 @@ main();
 
 function main() {
   showLoadingUser();
-  myFetch('/api/me')
+  getMe()
     .then(() => showHome())
     .catch(err => showLoggedOut());
 }
@@ -113,3 +115,9 @@ function submitNewBook() {
     .catch(() => { window.alert("Failed."); })
     .finally(() => { showHome(); });
 }
+
+window.showBook = showBook;
+window.showHome = showHome;
+window.showAdd = showAdd;
+window.submitNewBook = submitNewBook;
+window.toggleRead = toggleRead;

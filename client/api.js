@@ -1,19 +1,24 @@
-function getBooks() {
+export function getMe() {
+  return myFetch('/api/me')
+    .then(response => response.json());
+}
+
+export function getBooks() {
   return myFetch('/api/books')
     .then(response => response.json());
 }
 
-function getBook(id) {
+export function getBook(id) {
   return myFetch('/api/books/'+id)
     .then(response => response.json());
 }
 
-function setChapterRead(id) {
+export function setChapterRead(id) {
   return myFetch(`/api/chapters/${id}/read`, { method: 'POST' })
     .then(() => undefined);
 }
 
-function setChapterUnread(id) {
+export function setChapterUnread(id) {
   return myFetch(`/api/chapters/${id}/unread`, { method: 'POST' })
     .then(() => undefined);
 }
@@ -21,7 +26,7 @@ function setChapterUnread(id) {
 /**
  * body = { title: string, chapters: string[] }
  */
-function createBook(body) {
+export function createBook(body) {
   return myFetch('/api/books', {
     method: 'POST',
     headers: {
@@ -44,4 +49,3 @@ function myFetch(input, init) {
       return response;
     })
 }
-
