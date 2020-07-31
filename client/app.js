@@ -93,8 +93,10 @@ const bookPage = {
       }
 
       this.loading[chapter.id] = true;
-      await setChapterState(chapter.id);
-      await this.load();
+      try {
+        await setChapterState(chapter.id);
+        await this.load();
+      } catch (err) {}
       this.loading[chapter.id] = false;
     },
   },
