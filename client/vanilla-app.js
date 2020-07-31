@@ -4,10 +4,27 @@ const globals = {
   chapters: [],
 };
 
-showHome();
+main();
+
+function main() {
+  showLoadingUser();
+  myFetch('/api/me')
+    .then(() => showHome())
+    .catch(err => showLoggedOut());
+}
 
 function hideAllStates() {
   document.querySelectorAll('.state').forEach(el => el.classList.add('hide'));
+}
+
+function showLoadingUser() {
+  hideAllStates();
+  document.querySelector('#state-loading-user').classList.remove('hide');
+}
+
+function showLoggedOut() {
+  hideAllStates();
+  document.querySelector('#state-logged-out').classList.remove('hide');
 }
 
 function showHome() {
