@@ -85,6 +85,13 @@ const bookPage = {
     },
     toggle: async function (chapter) {
       const setChapterState = chapter.read_at ? setChapterUnread : setChapterRead;
+      const funcName = chapter.read_at ? 'UNREAD' : 'READ';
+
+      const yes = window.confirm(`Mark chapter "${chapter.title}" as ${funcName}?`);
+      if (!yes) {
+        return;
+      }
+
       this.loading[chapter.id] = true;
       await setChapterState(chapter.id);
       await this.load();
