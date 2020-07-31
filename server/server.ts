@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.static('../client'));
 app.use(require('morgan')('combined'));
 
-// From Passport example
+// From Passport example -- not sure if all these dependencies are necessary
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('express-session')({
@@ -29,6 +29,7 @@ app.use(require('express-session')({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.enable("trust proxy");
 
 
 passport.use(new FacebookStrategy(
