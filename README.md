@@ -63,6 +63,8 @@ heroku pg:psql < server/migrations/020--create-table-user.sql
 ```
 
 For auth, create an app in the [Facebook developer console][facebook-dev] and then set your app id and app secret via
+
+Differences from local development: You need to add the redirect URL (and maybe the domain). (And make sure to visit via HTTPS)
 ```
 heroku config:set FACEBOOK_CLIENT_ID=youridhere
 heroku config:set FACEBOOK_CLIENT_SECRET=yoursecrethere
