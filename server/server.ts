@@ -15,6 +15,19 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 app.use(express.json());
+
+// Force HTTPS. This is intentionally placed above .use(express.static)
+// A bit heavy-handed -- what do people usually do in real life?
+app.use(function(req, res, next) {
+  if (
+    req.protocol !== 'https'
+    && process.env.ENVIRONMENT !== 'dev'
+  ) {
+    return res.status(403).send({message: 'SSL required'});
+  }
+  next();
+});
+
 app.use(express.static('../client'));
 app.use(require('morgan')('combined'));
 
